@@ -20,11 +20,8 @@ if (process.env.NODE_ENV === 'production') {
 
 export default defineConfig({
   input: `src/main.ts`,
-  output: [
-    { file: pkg.main, name: pkg.name, format: 'umd' },
-    { file: pkg.module, format: 'es' },
-  ],
-  external: [],
+  output: [{ file: pkg.module, format: 'es' }],
+  external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
   watch: {
     include: 'src/**',
   },

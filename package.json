@@ -3,16 +3,28 @@
   "version": "0.1.0",
   "description": "Clean UTM-tagged urls in Node.js",
   "type": "module",
-  "main": "dist/url-cleaner.umd.js",
   "module": "dist/url-cleaner.esm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/url-cleaner.esm.js",
+      "types": "./dist/types/main.d.ts"
+    }
+  },
   "typings": "dist/types/main.d.ts",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "watch": "cross-env NODE_ENV=dev rollup -c rollup.config.mjs -w",
+    "update-lists": "node scripts/update-lists.js",
+    "prebuild": "npm run update-lists",
     "build": "rimraf ./dist && tsc && cross-env NODE_ENV=production rollup -c rollup.config.mjs && rimraf ./dist/lib",
-    "lint": "eslint ./src/**/*"
+    "lint": "eslint ./src/**/*",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "author": "BackRunner",
   "license": "MIT",
@@ -22,7 +34,7 @@
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.13.14",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-alloy": "^5.1.2",
@@ -30,10 +42,14 @@
     "eslint-plugin-import": "^2.31.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
-    "rollup": "^4.36.0",
+    "rollup": "^4.38.0",
     "rollup-plugin-filesize": "^10.0.0",
     "tslib": "^2.8.1",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.26.1"
+    "typescript-eslint": "^8.28.0",
+    "vitest": "^1.8.2"
+  },
+  "dependencies": {
+    "@gorhill/ubo-core": "^0.1.30"
   }
 }
