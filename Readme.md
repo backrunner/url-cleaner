@@ -1,4 +1,4 @@
-# url-cleaner
+# @backrunner/url-cleaner
 
 Clean query parameters from URLs using uBlock Origin's powerful filtering engine. Also supports URL shortener expansion and domain-specific cleaning rules.
 
@@ -7,7 +7,7 @@ This library uses [@gorhill/ubo-core](https://github.com/gorhill/uBlock/tree/mas
 ## Installation
 
 ```bash
-npm install url-cleaner
+npm install @backrunner/url-cleaner
 ```
 
 ### Requirements
@@ -17,10 +17,10 @@ npm install url-cleaner
 
 ```js
 // ✅ Works
-import URLCleaner from 'url-cleaner';
+import URLCleaner from '@backrunner/url-cleaner';
 
 // ❌ Does not work
-const URLCleaner = require('url-cleaner');
+const URLCleaner = require('@backrunner/url-cleaner');
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ const URLCleaner = require('url-cleaner');
 ### Basic Usage
 
 ```typescript
-import URLCleaner from 'url-cleaner';
+import URLCleaner from '@backrunner/url-cleaner';
 
 // Create a URL cleaner with filter rules
 const cleaner = new URLCleaner({
@@ -70,7 +70,7 @@ await cleaner.dispose();
 The library can follow redirects from URL shorteners (like bit.ly, t.co, b23.tv) and clean the resulting URLs:
 
 ```typescript
-import URLCleaner from 'url-cleaner';
+import URLCleaner from '@backrunner/url-cleaner';
 
 // Create a cleaner with redirection support
 const cleaner = new URLCleaner({
@@ -105,7 +105,7 @@ await cleaner.dispose();
 The library includes a helpful `FilterRuleBuilder` class to create filter rules programmatically:
 
 ```typescript
-import URLCleaner, { FilterRuleBuilder } from 'url-cleaner';
+import URLCleaner, { FilterRuleBuilder } from '@backrunner/url-cleaner';
 
 // Create filter rules using the builder
 const ruleBuilder = new FilterRuleBuilder();
@@ -148,7 +148,7 @@ const cleaner = new URLCleaner({
 The library includes built-in rules for specific domains:
 
 ```typescript
-import URLCleaner from 'url-cleaner';
+import URLCleaner from '@backrunner/url-cleaner';
 
 const cleaner = new URLCleaner({
   useDefaultLists: true,
@@ -171,7 +171,7 @@ console.log(xhsResult.url); // Output: https://www.xiaohongshu.com/discover
 The library comes with pre-configured filter lists from uBlock Origin and AdGuard:
 
 ```typescript
-import URLCleaner from 'url-cleaner';
+import URLCleaner from '@backrunner/url-cleaner';
 
 // Create a cleaner with default filter lists
 const cleaner = new URLCleaner({
@@ -193,7 +193,7 @@ import URLCleaner, {
   ADGUARD_GENERAL_TRACK_PARAMS,
   ADGUARD_SPECIFIC_TRACK_PARAMS,
   createDefaultFilterList,
-} from 'url-cleaner';
+} from '@backrunner/url-cleaner';
 
 // Create a cleaner with only specific built-in filters
 const cleaner = new URLCleaner({
