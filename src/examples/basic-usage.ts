@@ -37,8 +37,7 @@ async function example() {
     ]
   });
 
-  // Initialize the cleaner
-  await cleaner.init();
+  // No need to call init() anymore as it's done automatically in the constructor
 
   // Clean some URLs
   const examples = [

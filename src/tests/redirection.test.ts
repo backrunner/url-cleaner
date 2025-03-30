@@ -57,8 +57,8 @@ describe('URL Redirection Tests', () => {
       ]
     });
 
-    // Initialize the cleaner
-    await cleaner.init();
+    // Wait for initialization to complete
+    await cleaner['initPromise'];
   });
 
   afterAll(async () => {

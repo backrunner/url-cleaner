@@ -54,8 +54,7 @@ const cleaner = new URLCleaner({
   ],
 });
 
-// Initialize (must be called before using the cleaner)
-await cleaner.init();
+// Initialization happens automatically in the constructor
 
 // Clean a URL
 const result = await cleaner.cleanURLWithResult('https://example.com/page?id=123&utm_source=newsletter');
@@ -79,8 +78,6 @@ const cleaner = new URLCleaner({
   redirectTimeout: 3000, // Optional: Set timeout for redirect requests (default: 5000ms)
   useDefaultLists: true, // Use built-in filter lists
 });
-
-await cleaner.init();
 
 // Get detailed result with redirection information
 const result = await cleaner.cleanURLWithResult('https://b23.tv/BV1jT421a72z');
@@ -143,7 +140,7 @@ const cleaner = new URLCleaner({
   handleRedirects: true,
 });
 
-await cleaner.init();
+// Use the cleaner directly - initialization happens automatically
 ```
 
 ### Domain-Specific Cleaning Rules
@@ -157,8 +154,6 @@ const cleaner = new URLCleaner({
   useDefaultLists: true,
   handleRedirects: true,
 });
-
-await cleaner.init();
 
 // Bilibili links will have all query parameters removed
 const result = await cleaner.cleanURLWithResult(
@@ -182,8 +177,6 @@ import URLCleaner from 'url-cleaner';
 const cleaner = new URLCleaner({
   useDefaultLists: true, // This will load all built-in filter lists
 });
-
-await cleaner.init();
 
 // Clean a URL with tracking parameters
 const result = await cleaner.cleanURLWithResult('https://example.com/page?utm_source=newsletter&fbclid=123');
@@ -210,8 +203,6 @@ const cleaner = new URLCleaner({
     // createDefaultFilterList()
   ],
 });
-
-await cleaner.init();
 ```
 
 ### Providing Context

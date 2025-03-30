@@ -33,7 +33,9 @@ describe('URLCleaner', () => {
         FilterRuleBuilder.createCommonTrackingList(),
       ],
     });
-    await cleaner.init();
+
+    // Wait for initialization to complete
+    await cleaner['initPromise'];
   });
 
   afterEach(async () => {
@@ -47,12 +49,21 @@ describe('URLCleaner', () => {
     expect(cleaner['engine']).not.toBeNull();
   });
 
-  it('should throw error if trying to clean URL before initialization', async () => {
-    const uninitializedCleaner = new URLCleaner();
+  it('should start initialization in constructor', () => {
+    const newCleaner = new URLCleaner();
+    expect(newCleaner['initPromise']).not.toBeNull();
+  });
+
+  it('should throw error if initialization fails', async () => {
+    const mockInitFailed = new URLCleaner();
+    // Force the initialization to fail by setting initialized to false
+    mockInitFailed['initialized'] = false;
+    mockInitFailed['engine'] = null;
+    mockInitFailed['initPromise'] = Promise.resolve();
 
     await expect(async () => {
-      await uninitializedCleaner.cleanURLWithResult('https://example.com');
-    }).rejects.toThrow('URLCleaner not initialized');
+      await mockInitFailed.cleanURLWithResult('https://example.com');
+    }).rejects.toThrow('URLCleaner initialization failed');
   });
 
   it('should return original URL when no query parameters need cleaning', async () => {
@@ -142,13 +153,5 @@ describe('URLCleaner', () => {
     await cleaner.loadFilterLists([additionalList]);
 
     expect(mockEngine!.useLists).toHaveBeenCalledWith([additionalList]);
-  });
-
-  it('should throw error if trying to load filter lists before initialization', async () => {
-    const uninitializedCleaner = new URLCleaner();
-
-    await expect(async () => {
-      await uninitializedCleaner.loadFilterLists([{ name: 'test', raw: '' }]);
-    }).rejects.toThrow('URLCleaner not initialized');
   });
 });

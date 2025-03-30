@@ -85,9 +85,10 @@ export default class URLCleaner {
   private engine: StaticNetFilteringEngine | null = null;
   private initialized = false;
   private options: URLCleanerOptions;
+  private initPromise: Promise<void> | null = null;
 
   /**
-   * Create a URL cleaner
+   * Create a URL cleaner and initialize it
    * @param options Options
    */
   public constructor(options: URLCleanerOptions = {}) {
@@ -95,48 +96,9 @@ export default class URLCleaner {
       redirectTimeout: 5000,
       ...options
     };
-  }
 
-  /**
-   * Initialize the URL cleaner
-   */
-  public async init(): Promise<void> {
-    if (this.initialized) {
-      return;
-    }
-
-    // Enable WASM if needed
-    if (this.options.enableWASM !== false) {
-      await enableWASM();
-    }
-
-    // Create engine
-    this.engine = await StaticNetFilteringEngine.create({
-      noPSL: this.options.noPSL === true,
-    });
-
-    // Prepare filter lists
-    const filterLists: FilterList[] = [];
-
-    // Add user-provided filter lists if available
-    if (this.options.filterLists && this.options.filterLists.length > 0) {
-      filterLists.push(...this.options.filterLists);
-    }
-
-    // Add default filter lists if enabled
-    if (this.options.useDefaultLists) {
-      filterLists.push(...DEFAULT_FILTER_LISTS);
-    }
-
-    // Add domain-specific rules
-    filterLists.push(FilterRuleBuilder.createDomainSpecificList());
-
-    // Load filter lists if there are any
-    if (filterLists.length > 0) {
-      await this.engine.useLists(filterLists);
-    }
-
-    this.initialized = true;
+    // Start initialization in the constructor
+    this.initPromise = this.initializeEngine();
   }
 
   /**
@@ -146,9 +108,7 @@ export default class URLCleaner {
    * @returns Object containing cleaning result details
    */
   public async cleanURLWithResult(url: string, options: CleanURLOptions = {}): Promise<CleanURLResult> {
-    if (!this.initialized || !this.engine) {
-      throw new Error('URLCleaner not initialized. Call init() first.');
-    }
+    await this.ensureInitialized();
 
     // Initialize result
     const result: CleanURLResult = {
@@ -185,8 +145,8 @@ export default class URLCleaner {
     }
 
     // Apply parameter cleaning if URL has a query
-    if (this.engine.hasQuery({ originURL, url: currentUrl, type: 'main_frame' })) {
-      const engineResult = this.engine.filterQuery({
+    if (this.engine!.hasQuery({ originURL, url: currentUrl, type: 'main_frame' })) {
+      const engineResult = this.engine!.filterQuery({
         originURL,
         url: currentUrl,
       });
@@ -235,11 +195,8 @@ export default class URLCleaner {
    * @param lists Filter lists to load
    */
   public async loadFilterLists(lists: FilterList[]): Promise<void> {
-    if (!this.initialized || !this.engine) {
-      throw new Error('URLCleaner not initialized. Call init() first.');
-    }
-
-    await this.engine.useLists(lists);
+    await this.ensureInitialized();
+    await this.engine!.useLists(lists);
   }
 
   /**
@@ -249,9 +206,7 @@ export default class URLCleaner {
    * @returns Text with cleaned URLs
    */
   public async cleanURLsInText(text: string, options: CleanURLOptions = {}): Promise<string> {
-    if (!this.initialized || !this.engine) {
-      throw new Error('URLCleaner not initialized. Call init() first.');
-    }
+    await this.ensureInitialized();
 
     // Simple URL extraction regex
     const urlRegex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)/gi;
@@ -289,10 +244,74 @@ export default class URLCleaner {
    * Release resources
    */
   public async dispose(): Promise<void> {
+    // Wait for initialization to complete before disposing
+    if (this.initPromise) {
+      try {
+        await this.initPromise;
+      } catch {
+        // Ignore initialization errors during disposal
+      }
+    }
+
     if (this.engine) {
       await StaticNetFilteringEngine.release();
       this.engine = null;
       this.initialized = false;
+      this.initPromise = null;
+    }
+  }
+
+  /**
+   * Initialize the URL cleaner engine
+   */
+  private async initializeEngine(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    // Enable WASM if needed
+    if (this.options.enableWASM !== false) {
+      await enableWASM();
+    }
+
+    // Create engine
+    this.engine = await StaticNetFilteringEngine.create({
+      noPSL: this.options.noPSL === true,
+    });
+
+    // Prepare filter lists
+    const filterLists: FilterList[] = [];
+
+    // Add user-provided filter lists if available
+    if (this.options.filterLists && this.options.filterLists.length > 0) {
+      filterLists.push(...this.options.filterLists);
+    }
+
+    // Add default filter lists if enabled
+    if (this.options.useDefaultLists) {
+      filterLists.push(...DEFAULT_FILTER_LISTS);
+    }
+
+    // Add domain-specific rules
+    filterLists.push(FilterRuleBuilder.createDomainSpecificList());
+
+    // Load filter lists if there are any
+    if (filterLists.length > 0) {
+      await this.engine.useLists(filterLists);
+    }
+
+    this.initialized = true;
+  }
+
+  /**
+   * Ensures the cleaner is initialized before performing operations
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (this.initPromise) {
+      await this.initPromise;
+    }
+    if (!this.initialized || !this.engine) {
+      throw new Error('URLCleaner initialization failed. Please check your options and try again.');
     }
   }
 

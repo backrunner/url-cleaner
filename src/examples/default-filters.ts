@@ -10,8 +10,7 @@ async function example() {
     useDefaultLists: true // This will automatically load the built-in filter lists
   });
 
-  // Initialize the cleaner
-  await cleaner.init();
+  // Initialization happens automatically in the constructor
 
   console.log('Testing with default filter lists:');
   console.log('----------------------------------');

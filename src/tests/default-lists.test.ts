@@ -32,7 +32,8 @@ describe('URLCleaner with Default Lists', () => {
       useDefaultLists: true
     });
 
-    await cleaner.init();
+    // Wait for initialization to complete
+    await cleaner['initPromise'];
 
     const mockEngine = cleaner['engine'];
     expect(mockEngine!.useLists).toHaveBeenCalledTimes(1);
@@ -61,7 +62,8 @@ describe('URLCleaner with Default Lists', () => {
       useDefaultLists: false
     });
 
-    await cleaner.init();
+    // Wait for initialization to complete
+    await cleaner['initPromise'];
 
     const mockEngine = cleaner['engine'];
 
@@ -97,7 +99,8 @@ describe('URLCleaner with Default Lists', () => {
       filterLists: [customList]
     });
 
-    await cleaner.init();
+    // Wait for initialization to complete
+    await cleaner['initPromise'];
 
     const mockEngine = cleaner['engine'];
     expect(mockEngine!.useLists).toHaveBeenCalledTimes(1);
@@ -125,7 +128,8 @@ describe('URLCleaner with Default Lists', () => {
       useDefaultLists: false
     });
 
-    await cleaner.init();
+    // Wait for initialization to complete
+    await cleaner['initPromise'];
 
     const mockEngine = cleaner['engine'];
     expect(mockEngine!.useLists).toHaveBeenCalledTimes(1);
